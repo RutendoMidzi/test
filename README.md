@@ -12,4 +12,4 @@
 
 Допускается использование Composer
 
-Below is an example of a PHP class that works with the JSONPlaceholder API, providing methods for getting users, their posts, and tasks, as well as methods for working with specific posts (adding, editing, deleting). I'll also include a basic example of how to use this class and a GitHub repository where you can find the code.
+Below is an example implementation of a PHP class that interacts with the JSONPlaceholder API, specifically focusing on users, posts, and tasks. The class also includes methods to work with a specific post, such as adding, editing, and deleting.
