@@ -1,100 +1,97 @@
 <?php
 
-require 'vendor/autoload.php';
+require 'vendor/autoload.php'; 
 
 use GuzzleHttp\Client;
 
-class JSONPlaceholderAPI
+class JsonPlaceholderAPI
 {
-    private $client;
-    private $baseUrl = 'https://jsonplaceholder.typicode.com';
+    private $baseUri;
+    private $httpClient;
 
     public function __construct()
     {
-        $this->client = new Client();
+        $this->baseUri = 'https://jsonplaceholder.typicode.com';
+        $this->httpClient = new Client(['base_uri' => $this->baseUri]);
     }
 
     public function getUsers()
     {
-        $response = $this->client->get("$this->baseUrl/users");
+        $response = $this->httpClient->get('/users');
         return json_decode($response->getBody(), true);
     }
 
     public function getUserPosts($userId)
     {
-        $response = $this->client->get("$this->baseUrl/posts?userId=$userId");
+        $response = $this->httpClient->get("/users/{$userId}/posts");
         return json_decode($response->getBody(), true);
     }
 
     public function getUserTasks($userId)
     {
-        $response = $this->client->get("$this->baseUrl/todos?userId=$userId");
+        $response = $this->httpClient->get("/users/{$userId}/todos");
         return json_decode($response->getBody(), true);
     }
 
     public function getPost($postId)
     {
-        $response = $this->client->get("$this->baseUrl/posts/$postId");
+        $response = $this->httpClient->get("/posts/{$postId}");
         return json_decode($response->getBody(), true);
     }
 
-    public function addPost($data)
+    public function addPost($userId, $title, $body)
     {
-        $response = $this->client->post("$this->baseUrl/posts", [
-            'json' => $data,
+        $response = $this->httpClient->post('/posts', [
+            'json' => [
+                'userId' => $userId,
+                'title' => $title,
+                'body' => $body,
+            ],
         ]);
         return json_decode($response->getBody(), true);
     }
 
-    public function editPost($postId, $data)
+    public function editPost($postId, $title, $body)
     {
-        $response = $this->client->put("$this->baseUrl/posts/$postId", [
-            'json' => $data,
+        $response = $this->httpClient->put("/posts/{$postId}", [
+            'json' => [
+                'title' => $title,
+                'body' => $body,
+            ],
         ]);
         return json_decode($response->getBody(), true);
     }
 
     public function deletePost($postId)
     {
-        $response = $this->client->delete("$this->baseUrl/posts/$postId");
+        $response = $this->httpClient->delete("/posts/{$postId}");
         return $response->getStatusCode() === 200;
     }
 }
 
-// Example usage:
-$api = new JSONPlaceholderAPI();
+// Example usage
+$jsonPlaceholder = new JsonPlaceholderAPI();
 
 // Get users
-$users = $api->getUsers();
+$users = $jsonPlaceholder->getUsers();
 print_r($users);
 
-// Get user's posts
-$userPosts = $api->getUserPosts(1);
+// Get user posts
+$userPosts = $jsonPlaceholder->getUserPosts(1);
 print_r($userPosts);
 
-// Get user's tasks
-$userTasks = $api->getUserTasks(1);
+// Get user tasks
+$userTasks = $jsonPlaceholder->getUserTasks(1);
 print_r($userTasks);
 
 // Add a new post
-$newPostData = [
-    'userId' => 1,
-    'title' => 'New Post',
-    'body' => 'This is a new post.',
-];
-$newPost = $api->addPost($newPostData);
+$newPost = $jsonPlaceholder->addPost(1, 'New Post Title', 'New Post Body');
 print_r($newPost);
 
 // Edit a post
-$editedPostData = [
-    'title' => 'Edited Post',
-    'body' => 'This post has been edited.',
-];
-$editedPost = $api->editPost(1, $editedPostData);
+$editedPost = $jsonPlaceholder->editPost(1, 'Edited Post Title', 'Edited Post Body');
 print_r($editedPost);
 
 // Delete a post
-$deleted = $api->deletePost(1);
-echo $deleted ? "Post deleted successfully." : "Failed to delete post.";
-
-?>
+$deleteResult = $jsonPlaceholder->deletePost(1);
+var_dump($deleteResult);
